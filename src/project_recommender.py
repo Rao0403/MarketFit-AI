@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -26,8 +27,6 @@ def _load_prompt(prompt_path: str | Path) -> str:
 
 
 def _build_rule_based_projects(report: Dict[str, Any]) -> List[Dict[str, Any]]:
-    top_skill_names = [row["skill"] for row in report.get("top_skills", [])]
-
     return [
         {
             "title": "Production-Ready RAG Support Assistant",
@@ -117,17 +116,69 @@ def _build_rule_based_projects(report: Dict[str, Any]) -> List[Dict[str, Any]]:
     ]
 
 
+def _extract_json_candidates(text: str) -> List[str]:
+    candidates: List[str] = []
+    if not text:
+        return candidates
+
+    fenced_blocks = re.findall(r"```(?:json)?\s*([\s\S]*?)```", text, flags=re.IGNORECASE)
+    for block in fenced_blocks:
+        block = block.strip()
+        if block:
+            candidates.append(block)
+
+    trimmed = text.strip()
+    if trimmed:
+        candidates.append(trimmed)
+
+    first_obj = text.find("{")
+    last_obj = text.rfind("}")
+    if first_obj != -1 and last_obj != -1 and last_obj > first_obj:
+        candidates.append(text[first_obj : last_obj + 1].strip())
+
+    first_arr = text.find("[")
+    last_arr = text.rfind("]")
+    if first_arr != -1 and last_arr != -1 and last_arr > first_arr:
+        candidates.append(text[first_arr : last_arr + 1].strip())
+
+    seen = set()
+    unique_candidates: List[str] = []
+    for candidate in candidates:
+        if candidate not in seen:
+            seen.add(candidate)
+            unique_candidates.append(candidate)
+    return unique_candidates
+
+
+def _validate_project_list(value: Any) -> List[Dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    projects = [item for item in value if isinstance(item, dict)]
+    return projects if projects else []
+
+
 def _try_parse_project_json(text: str) -> List[Dict[str, Any]]:
     if not text or text.startswith("[fallback]"):
         return []
-    try:
-        parsed = json.loads(text)
-        projects = parsed.get("projects", [])
-        if isinstance(projects, list):
-            return projects
-        return []
-    except Exception:
-        return []
+    for candidate in _extract_json_candidates(text):
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                if "projects" in parsed:
+                    projects = _validate_project_list(parsed["projects"])
+                    if projects:
+                        return projects
+                if "recommendations" in parsed:
+                    projects = _validate_project_list(parsed["recommendations"])
+                    if projects:
+                        return projects
+            if isinstance(parsed, list):
+                projects = _validate_project_list(parsed)
+                if projects:
+                    return projects
+        except Exception:
+            continue
+    return []
 
 
 def run_market_project_recommender(
@@ -148,11 +199,13 @@ def run_market_project_recommender(
     llm_raw = _chat_with_ollama(prompt, model=model, host=host)
     llm_projects = _try_parse_project_json(llm_raw)
     final_projects = llm_projects if llm_projects else rule_based_projects
+    project_source = "llm" if llm_projects else "rule_based_fallback"
 
     payload = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "project_count": len(final_projects),
         "projects": final_projects,
+        "project_source": project_source,
         "ollama_raw_response": llm_raw,
     }
 
@@ -168,6 +221,7 @@ def run_market_project_recommender(
         "# MarketFit-AI Project Recommendations",
         "",
         f"Generated: {payload['generated_at']}",
+        f"Source: {project_source}",
         "",
     ]
 

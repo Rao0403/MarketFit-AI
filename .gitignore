@@ -2,5 +2,6 @@
 __pycache__/
 *.pyc
 .env
+/outputs
 outputs/**/*.tmp
 .ipynb_checkpoints/
