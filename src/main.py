@@ -17,7 +17,7 @@ def main() -> None:
     load_dotenv()
 
     project_root = Path(__file__).resolve().parent.parent
-    model = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
+    model = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
     host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 
     market_report = run_jd_intelligence_engine(
