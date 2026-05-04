@@ -1,0 +1,24 @@
+﻿AI Engineer - Applied ML and LLM Systems
+Location: Remote (India)
+Experience: 0-2 years
+
+Role Overview:
+Join our applied AI team to create intelligent assistants and automate enterprise workflows. You will own end-to-end implementation from data preprocessing to deployment.
+
+Responsibilities:
+- Fine-tune open-source models for domain-specific question answering.
+- Build agentic workflows that can reason over multiple tools and data sources.
+- Create batch and real-time inference pipelines with robust error handling.
+- Partner with DevOps to deploy inference services on cloud infrastructure.
+- Improve model quality through offline and online evaluation loops.
+
+Required Skills:
+- Python, APIs, and clean code practices.
+- Experience with transformers, Hugging Face tooling, and model serving.
+- Understanding of RAG, prompt engineering, and LLM evaluation.
+- Familiarity with Docker, GitHub Actions, and cloud deployment basics.
+- Strong communication and documentation habits.
+
+Preferred:
+- Exposure to RLHF concepts or lightweight fine-tuning methods (LoRA/QLoRA).
+- Working knowledge of monitoring stacks and experiment tracking.

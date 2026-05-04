@@ -1,0 +1,24 @@
+﻿AI Research Intern - Multimodal and Reasoning Models
+Location: Bengaluru (On-site)
+Duration: 6 months
+
+Role Overview:
+We are looking for an AI Research Intern to prototype novel techniques in LLM reasoning, multimodal learning, and model evaluation. This is a research-heavy role with direct mentorship from senior scientists.
+
+Responsibilities:
+- Reproduce and extend recent papers on reasoning and multimodal transformers.
+- Run structured experiments and ablation studies using PyTorch.
+- Build benchmarking scripts for factuality, robustness, and safety.
+- Curate datasets and design annotation protocols for evaluation.
+- Present findings in weekly research reviews with clear visualizations.
+
+Required Skills:
+- Strong Python and linear algebra fundamentals.
+- Familiarity with deep learning frameworks (PyTorch preferred).
+- Understanding of transformer architectures and attention mechanisms.
+- Ability to read research papers and implement ideas quickly.
+- Clear technical writing and experiment documentation.
+
+Nice to Have:
+- Experience with distributed training, W&B, or experiment tracking tools.
+- Prior work on LLM evaluation or multimodal tasks.

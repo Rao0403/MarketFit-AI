@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-05-04T16:02:48.342357Z",
+  "project_count": 5,
+  "projects": [
+    {
+      "title": "Production-Ready RAG Support Assistant",
+      "why_valuable": "RAG and vector retrieval appear repeatedly in AI Engineer hiring signals.",
+      "skills_covered": [
+        "python",
+        "rag",
+        "vector_databases",
+        "prompt_engineering",
+        "mlops_deployment"
+      ],
+      "evidence_from_jds": [
+        "Multiple JDs require RAG pipelines and vector databases.",
+        "Deployment and API integration are common expectations."
+      ],
+      "difficulty_level": "Intermediate",
+      "portfolio_impact": "Shows full-stack AI engineering from retrieval to deployment.",
+      "roadmap": [
+        "Ingest domain docs and chunk content.",
+        "Build retrieval + reranking pipeline.",
+        "Add prompt guardrails and citations.",
+        "Deploy with FastAPI + Docker and monitor quality."
+      ]
+    },
+    {
+      "title": "LLM Evaluation and Safety Benchmark Suite",
+      "why_valuable": "Evaluation, robustness, and factuality are strong market signals across engineering and research roles.",
+      "skills_covered": [
+        "model_evaluation",
+        "llms",
+        "python",
+        "experiment_tracking"
+      ],
+      "evidence_from_jds": [
+        "JDs mention evaluation loops, benchmark scripts, and quality tracking.",
+        "Research intern roles ask for factuality and robustness studies."
+      ],
+      "difficulty_level": "Intermediate",
+      "portfolio_impact": "Demonstrates measurable quality engineering for AI products.",
+      "roadmap": [
+        "Define task-specific evaluation metrics.",
+        "Create benchmark dataset and test harness.",
+        "Run model comparisons with error analysis.",
+        "Publish dashboard and improvement report."
+      ]
+    },
+    {
+      "title": "Domain LLM Fine-Tuning and Serving Pipeline",
+      "why_valuable": "Fine-tuning and serving open-source models are directly requested in applied AI roles.",
+      "skills_covered": [
+        "fine_tuning",
+        "transformers",
+        "pytorch",
+        "mlops_deployment"
+      ],
+      "evidence_from_jds": [
+        "Applied ML JD asks for fine-tuning and model serving.",
+        "Hugging Face and transformer tooling are explicitly required."
+      ],
+      "difficulty_level": "Advanced",
+      "portfolio_impact": "Shows ownership from adaptation to production deployment.",
+      "roadmap": [
+        "Prepare and validate domain training data.",
+        "Fine-tune using LoRA/QLoRA.",
+        "Evaluate against baseline model.",
+        "Serve model through API with monitoring."
+      ]
+    },
+    {
+      "title": "Agentic Research Workflow Assistant",
+      "why_valuable": "Agentic systems and tool-using AI workflows are increasing in job requirements.",
+      "skills_covered": [
+        "agentic_workflows",
+        "llms",
+        "python",
+        "prompt_engineering"
+      ],
+      "evidence_from_jds": [
+        "JD responsibilities include building agentic workflows.",
+        "Cross-tool reasoning and automation are highlighted."
+      ],
+      "difficulty_level": "Intermediate",
+      "portfolio_impact": "Demonstrates practical orchestration of multi-step AI agents.",
+      "roadmap": [
+        "Define tools and task planner design.",
+        "Implement agent routing and tool calls.",
+        "Add memory, fallback logic, and safeguards.",
+        "Evaluate real-world tasks and document results."
+      ]
+    },
+    {
+      "title": "Multimodal Paper Reproduction Mini-Lab",
+      "why_valuable": "Research intern demand emphasizes paper implementation, ablations, and clear reporting.",
+      "skills_covered": [
+        "multimodal",
+        "pytorch",
+        "model_evaluation",
+        "transformers"
+      ],
+      "evidence_from_jds": [
+        "Research role requires reproducing papers and running ablation studies.",
+        "Benchmarking and technical presentation are repeated expectations."
+      ],
+      "difficulty_level": "Advanced",
+      "portfolio_impact": "Signals strong research execution and experiment discipline.",
+      "roadmap": [
+        "Select one recent multimodal paper.",
+        "Reproduce baseline with open data.",
+        "Run ablations and robustness tests.",
+        "Publish technical report with findings."
+      ]
+    }
+  ],
+  "ollama_raw_response": "[fallback] Ollama response unavailable: No module named 'ollama'"
+}

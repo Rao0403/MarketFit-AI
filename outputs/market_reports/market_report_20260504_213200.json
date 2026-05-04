@@ -1,0 +1,191 @@
+{
+  "generated_at": "2026-05-04T16:01:56.448049Z",
+  "jd_count": 3,
+  "role_distribution": {
+    "AI Engineer": 2,
+    "AI Research Intern": 1
+  },
+  "top_skills": [
+    {
+      "skill": "model_evaluation",
+      "documents_with_skill": 3,
+      "total_mentions": 10
+    },
+    {
+      "skill": "llms",
+      "documents_with_skill": 3,
+      "total_mentions": 6
+    },
+    {
+      "skill": "python",
+      "documents_with_skill": 3,
+      "total_mentions": 3
+    },
+    {
+      "skill": "mlops_deployment",
+      "documents_with_skill": 2,
+      "total_mentions": 8
+    },
+    {
+      "skill": "transformers",
+      "documents_with_skill": 2,
+      "total_mentions": 4
+    },
+    {
+      "skill": "pytorch",
+      "documents_with_skill": 2,
+      "total_mentions": 3
+    },
+    {
+      "skill": "experiment_tracking",
+      "documents_with_skill": 2,
+      "total_mentions": 3
+    },
+    {
+      "skill": "rag",
+      "documents_with_skill": 2,
+      "total_mentions": 2
+    },
+    {
+      "skill": "vector_databases",
+      "documents_with_skill": 1,
+      "total_mentions": 4
+    },
+    {
+      "skill": "fine_tuning",
+      "documents_with_skill": 1,
+      "total_mentions": 4
+    }
+  ],
+  "skill_frequency": {
+    "python": {
+      "documents_with_skill": 3,
+      "total_mentions": 3
+    },
+    "llms": {
+      "documents_with_skill": 3,
+      "total_mentions": 6
+    },
+    "rag": {
+      "documents_with_skill": 2,
+      "total_mentions": 2
+    },
+    "vector_databases": {
+      "documents_with_skill": 1,
+      "total_mentions": 4
+    },
+    "prompt_engineering": {
+      "documents_with_skill": 1,
+      "total_mentions": 1
+    },
+    "model_evaluation": {
+      "documents_with_skill": 3,
+      "total_mentions": 10
+    },
+    "pytorch": {
+      "documents_with_skill": 2,
+      "total_mentions": 3
+    },
+    "tensorflow": {
+      "documents_with_skill": 1,
+      "total_mentions": 1
+    },
+    "transformers": {
+      "documents_with_skill": 2,
+      "total_mentions": 4
+    },
+    "fine_tuning": {
+      "documents_with_skill": 1,
+      "total_mentions": 4
+    },
+    "mlops_deployment": {
+      "documents_with_skill": 2,
+      "total_mentions": 8
+    },
+    "agentic_workflows": {
+      "documents_with_skill": 1,
+      "total_mentions": 2
+    },
+    "multimodal": {
+      "documents_with_skill": 1,
+      "total_mentions": 4
+    },
+    "experiment_tracking": {
+      "documents_with_skill": 2,
+      "total_mentions": 3
+    }
+  },
+  "repeated_responsibilities": [
+    {
+      "responsibility": "Build and deploy RAG pipelines using vector databases and hybrid retrieval.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Design prompt strategies, guardrails, and evaluation harnesses for LLM responses.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Develop APIs with FastAPI and integrate model workflows into microservices.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Implement observability for latency, hallucination risk, and answer quality.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Collaborate with MLOps to containerize and deploy services using Docker and Kubernetes.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Build agentic workflows that can reason over multiple tools and data sources.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Reproduce and extend recent papers on reasoning and multimodal transformers.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Run structured experiments and ablation studies using PyTorch.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Build benchmarking scripts for factuality, robustness, and safety.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Curate datasets and design annotation protocols for evaluation.",
+      "frequency": 1
+    },
+    {
+      "responsibility": "Present findings in weekly research reviews with clear visualizations.",
+      "frequency": 1
+    }
+  ],
+  "project_worthy_themes": [
+    {
+      "theme": "llm_evaluation_and_safety",
+      "score": 6
+    },
+    {
+      "theme": "research_benchmarking",
+      "score": 6
+    },
+    {
+      "theme": "applied_model_deployment",
+      "score": 5
+    },
+    {
+      "theme": "production_rag_systems",
+      "score": 4
+    },
+    {
+      "theme": "agentic_ai_automation",
+      "score": 4
+    },
+    {
+      "theme": "fine_tuning_and_adaptation",
+      "score": 3
+    }
+  ],
+  "llm_market_summary": "[fallback] Ollama response unavailable: model 'llama3.1:8b' not found (status code: 404)"
+}
