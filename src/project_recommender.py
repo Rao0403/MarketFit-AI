@@ -157,6 +157,57 @@ def _validate_project_list(value: Any) -> List[Dict[str, Any]]:
     return projects if projects else []
 
 
+def _infer_target_roles(project: Dict[str, Any], available_roles: List[str]) -> List[str]:
+    combined = " ".join(
+        [
+            project.get("title", ""),
+            project.get("why_valuable", ""),
+            " ".join(project.get("evidence_from_jds", [])),
+            " ".join(project.get("skills_covered", [])),
+        ]
+    ).lower()
+
+    role_hits: List[str] = []
+    for role in available_roles:
+        role_lower = role.lower()
+        if "research intern" in role_lower:
+            research_signals = ("research", "ablation", "multimodal", "paper", "benchmark")
+            if any(signal in combined for signal in research_signals):
+                role_hits.append(role)
+        elif "engineer" in role_lower:
+            engineer_signals = ("deployment", "rag", "api", "pipeline", "production", "mlops")
+            if any(signal in combined for signal in engineer_signals):
+                role_hits.append(role)
+
+    if role_hits:
+        return role_hits
+    return available_roles[:1] if available_roles else ["General"]
+
+
+def _normalize_project(project: Dict[str, Any], available_roles: List[str]) -> Dict[str, Any]:
+    normalized = {
+        "title": str(project.get("title", "Untitled Project")),
+        "why_valuable": str(project.get("why_valuable", "")),
+        "skills_covered": [str(item) for item in project.get("skills_covered", []) if str(item).strip()],
+        "evidence_from_jds": [str(item) for item in project.get("evidence_from_jds", []) if str(item).strip()],
+        "difficulty_level": str(project.get("difficulty_level", "Intermediate")),
+        "portfolio_impact": str(project.get("portfolio_impact", "")),
+        "roadmap": [str(item) for item in project.get("roadmap", []) if str(item).strip()],
+    }
+
+    existing_roles = project.get("target_roles", [])
+    if isinstance(existing_roles, list) and existing_roles:
+        normalized["target_roles"] = [str(item) for item in existing_roles if str(item).strip()]
+    else:
+        normalized["target_roles"] = _infer_target_roles(normalized, available_roles)
+
+    return normalized
+
+
+def _normalize_projects(projects: List[Dict[str, Any]], available_roles: List[str]) -> List[Dict[str, Any]]:
+    return [_normalize_project(project, available_roles) for project in projects]
+
+
 def _try_parse_project_json(text: str) -> List[Dict[str, Any]]:
     if not text or text.startswith("[fallback]"):
         return []
@@ -188,7 +239,12 @@ def run_market_project_recommender(
     model: str,
     host: str,
 ) -> Dict[str, Any]:
+    available_roles = list(market_report.get("role_distribution", {}).keys())
+    if not available_roles:
+        available_roles = ["AI Engineer"]
+
     rule_based_projects = _build_rule_based_projects(market_report)
+    rule_based_projects = _normalize_projects(rule_based_projects, available_roles)
 
     prompt_template = _load_prompt(prompt_path)
     prompt = prompt_template.format(
@@ -198,12 +254,14 @@ def run_market_project_recommender(
 
     llm_raw = _chat_with_ollama(prompt, model=model, host=host)
     llm_projects = _try_parse_project_json(llm_raw)
+    llm_projects = _normalize_projects(llm_projects, available_roles) if llm_projects else []
     final_projects = llm_projects if llm_projects else rule_based_projects
     project_source = "llm" if llm_projects else "rule_based_fallback"
 
     payload = {
         "generated_at": datetime.utcnow().isoformat() + "Z",
         "project_count": len(final_projects),
+        "available_roles": available_roles,
         "projects": final_projects,
         "project_source": project_source,
         "ollama_raw_response": llm_raw,
