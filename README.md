@@ -28,9 +28,6 @@ MarketFit-AI/
 |  |- raw_jds/
 |  |- processed/
 |  `- resumes/
-|- notebooks/
-|  |- 01_jd_analysis.ipynb
-|  `- 02_market_project_recommender.ipynb
 |- src/
 |  |- jd_parser.py
 |  |- skill_extractor.py
