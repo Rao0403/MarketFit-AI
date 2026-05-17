@@ -1,36 +1,50 @@
 ﻿from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-from .jd_parser import jd_snippets, load_job_descriptions
+from .jd_parser import load_job_descriptions
 from .skill_extractor import (
+    extract_cluster_frequency,
     extract_project_themes,
     extract_responsibility_signals,
-    extract_skill_signals,
+    extract_role_expectations,
+    extract_role_tag_counts,
+    extract_signal_frequency,
+    split_signal_frequency,
     top_skills,
+    top_tools,
 )
 
 
-def _chat_with_ollama(prompt: str, model: str, host: str) -> str:
-    try:
-        from ollama import Client
-
-        client = Client(host=host)
-        response = client.chat(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            options={"temperature": 0.2},
+def _to_skill_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    transformed = []
+    for row in rows:
+        transformed.append(
+            {
+                "skill": row["name"],
+                "cluster": row["cluster"],
+                "documents_with_skill": row["documents_with_signal"],
+                "total_mentions": row["total_mentions"],
+            }
         )
-        return response["message"]["content"]
-    except Exception as exc:
-        return f"[fallback] Ollama response unavailable: {exc}"
+    return transformed
 
 
-def _load_prompt(prompt_path: str | Path) -> str:
-    return Path(prompt_path).read_text(encoding="utf-8")
+def _to_tool_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    transformed = []
+    for row in rows:
+        transformed.append(
+            {
+                "tool": row["name"],
+                "cluster": row["cluster"],
+                "documents_with_tool": row["documents_with_signal"],
+                "total_mentions": row["total_mentions"],
+            }
+        )
+    return transformed
 
 
 def run_jd_intelligence_engine(
@@ -40,34 +54,36 @@ def run_jd_intelligence_engine(
     model: str,
     host: str,
 ) -> Dict[str, Any]:
+    _ = prompt_path
+    _ = model
+    _ = host
+
     jds = load_job_descriptions(raw_jd_dir)
-    skill_signals = extract_skill_signals(jds)
-    responsibility_signals = extract_responsibility_signals(jds)
-    project_themes = extract_project_themes(skill_signals)
-    ranked_skills = top_skills(skill_signals)
+
+    signal_frequency = extract_signal_frequency(jds)
+    split_frequency = split_signal_frequency(signal_frequency)
+    ranked_skills = _to_skill_rows(top_skills(signal_frequency, top_k=12))
+    ranked_tools = _to_tool_rows(top_tools(signal_frequency, top_k=12))
 
     role_distribution: Dict[str, int] = {}
     for jd in jds:
         role_distribution[jd.role] = role_distribution.get(jd.role, 0) + 1
 
     payload: Dict[str, Any] = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "jd_count": len(jds),
+        "source_files": [jd.file_name for jd in jds],
         "role_distribution": role_distribution,
+        "role_tag_distribution": extract_role_tag_counts(jds),
         "top_skills": ranked_skills,
-        "skill_frequency": skill_signals,
-        "repeated_responsibilities": responsibility_signals,
-        "project_worthy_themes": project_themes,
+        "top_tools": ranked_tools,
+        "skill_frequency": split_frequency["skill_frequency"],
+        "tool_frequency": split_frequency["tool_frequency"],
+        "cluster_frequency": extract_cluster_frequency(signal_frequency),
+        "common_role_expectations": extract_role_expectations(jds),
+        "repeated_responsibilities": extract_responsibility_signals(jds),
+        "project_worthy_themes": extract_project_themes(signal_frequency),
     }
-
-    prompt_template = _load_prompt(prompt_path)
-    prompt = prompt_template.format(
-        jd_count=len(jds),
-        analysis_json=json.dumps(payload, indent=2),
-        jd_snippets=jd_snippets(jds),
-    )
-    llm_summary = _chat_with_ollama(prompt, model=model, host=host)
-    payload["llm_market_summary"] = llm_summary
 
     out_base = Path(output_dir)
     out_base.mkdir(parents=True, exist_ok=True)
@@ -85,24 +101,34 @@ def run_jd_intelligence_engine(
         "",
         "## Top Skills",
     ]
+
     for row in ranked_skills:
         lines.append(
-            f"- {row['skill']}: {row['documents_with_skill']} docs, {row['total_mentions']} mentions"
+            f"- {row['skill']} ({row['cluster']}): {row['documents_with_skill']} docs, {row['total_mentions']} mentions"
         )
 
     lines.append("")
+    lines.append("## Top Tools")
+    for row in ranked_tools:
+        lines.append(
+            f"- {row['tool']} ({row['cluster']}): {row['documents_with_tool']} docs, {row['total_mentions']} mentions"
+        )
+
+    lines.append("")
+    lines.append("## Common Role Expectations")
+    for row in payload["common_role_expectations"][:12]:
+        lines.append(f"- ({row['frequency']}x) {row['expectation']}")
+
+    lines.append("")
     lines.append("## Repeated Responsibilities")
-    for row in responsibility_signals:
+    for row in payload["repeated_responsibilities"][:12]:
         lines.append(f"- ({row['frequency']}x) {row['responsibility']}")
 
     lines.append("")
     lines.append("## Project-Worthy Themes")
-    for row in project_themes:
-        lines.append(f"- {row['theme']} (score: {row['score']})")
-
-    lines.append("")
-    lines.append("## Ollama Market Narrative")
-    lines.append(llm_summary)
+    for row in payload["project_worthy_themes"]:
+        evidence = ", ".join(row.get("evidence_signals", []))
+        lines.append(f"- {row['theme']} (score: {row['score']}, evidence: {evidence})")
 
     md_path.write_text("\n".join(lines), encoding="utf-8")
 
