@@ -6,17 +6,15 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from .jd_parser import load_job_descriptions
+from .skill_clusterer import assign_clusters, build_cluster_counts, load_cluster_map
 from .skill_extractor import (
-    extract_cluster_frequency,
     extract_project_themes,
     extract_responsibility_signals,
     extract_role_expectations,
     extract_role_tag_counts,
     extract_signal_frequency,
-    split_signal_frequency,
-    top_skills,
-    top_tools,
 )
+from .trend_analyzer import build_trend_payload
 
 
 def _to_skill_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -47,6 +45,25 @@ def _to_tool_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return transformed
 
 
+def _split_frequency(clustered_signal_frequency: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Dict[str, Any]]]:
+    skill_frequency: Dict[str, Dict[str, Any]] = {}
+    tool_frequency: Dict[str, Dict[str, Any]] = {}
+
+    for signal, payload in clustered_signal_frequency.items():
+        compact = {
+            "documents_with_signal": payload["documents_with_signal"],
+            "total_mentions": payload["total_mentions"],
+            "cluster": payload["cluster"],
+        }
+
+        if payload.get("signal_type") == "tool":
+            tool_frequency[signal] = compact
+        else:
+            skill_frequency[signal] = compact
+
+    return {"skill_frequency": skill_frequency, "tool_frequency": tool_frequency}
+
+
 def run_jd_intelligence_engine(
     raw_jd_dir: str | Path,
     prompt_path: str | Path,
@@ -61,9 +78,15 @@ def run_jd_intelligence_engine(
     jds = load_job_descriptions(raw_jd_dir)
 
     signal_frequency = extract_signal_frequency(jds)
-    split_frequency = split_signal_frequency(signal_frequency)
-    ranked_skills = _to_skill_rows(top_skills(signal_frequency, top_k=12))
-    ranked_tools = _to_tool_rows(top_tools(signal_frequency, top_k=12))
+    cluster_map = load_cluster_map(Path(raw_jd_dir).parent / "processed" / "skill_cluster_map.json")
+    clustered_signal_frequency = assign_clusters(signal_frequency, cluster_map)
+
+    cluster_counts = build_cluster_counts(clustered_signal_frequency)
+    trend_payload = build_trend_payload(clustered_signal_frequency, cluster_counts, top_k=12)
+    split_frequency = _split_frequency(clustered_signal_frequency)
+
+    ranked_skills = _to_skill_rows(trend_payload["ranked_skills"])
+    ranked_tools = _to_tool_rows(trend_payload["ranked_tools"])
 
     role_distribution: Dict[str, int] = {}
     for jd in jds:
@@ -75,14 +98,16 @@ def run_jd_intelligence_engine(
         "source_files": [jd.file_name for jd in jds],
         "role_distribution": role_distribution,
         "role_tag_distribution": extract_role_tag_counts(jds),
+        "cluster_map": cluster_map,
         "top_skills": ranked_skills,
         "top_tools": ranked_tools,
         "skill_frequency": split_frequency["skill_frequency"],
         "tool_frequency": split_frequency["tool_frequency"],
-        "cluster_frequency": extract_cluster_frequency(signal_frequency),
+        "cluster_frequency": cluster_counts,
+        "trend_layer": trend_payload,
         "common_role_expectations": extract_role_expectations(jds),
         "repeated_responsibilities": extract_responsibility_signals(jds),
-        "project_worthy_themes": extract_project_themes(signal_frequency),
+        "project_worthy_themes": extract_project_themes(clustered_signal_frequency),
     }
 
     out_base = Path(output_dir)
@@ -99,9 +124,16 @@ def run_jd_intelligence_engine(
         f"Generated: {payload['generated_at']}",
         f"JD Count: {payload['jd_count']}",
         "",
-        "## Top Skills",
+        "## Cluster Trend Table",
     ]
 
+    for row in trend_payload["cluster_trend_table"]:
+        lines.append(
+            f"- {row['cluster']}: score={row['cluster_score']}, docs={row['documents_with_signal_total']}, mentions={row['total_mentions']}"
+        )
+
+    lines.append("")
+    lines.append("## Top Skills")
     for row in ranked_skills:
         lines.append(
             f"- {row['skill']} ({row['cluster']}): {row['documents_with_skill']} docs, {row['total_mentions']} mentions"

@@ -1,0 +1,44 @@
+﻿{
+  "LLM Systems": [
+    "llms",
+    "prompt_engineering",
+    "transformers",
+    "fine_tuning",
+    "langchain",
+    "llamaindex",
+    "huggingface"
+  ],
+  "RAG": [
+    "rag",
+    "retrieval",
+    "vector_databases"
+  ],
+  "Agents": [
+    "agentic_workflows",
+    "tool_orchestration"
+  ],
+  "Evaluation": [
+    "model_evaluation",
+    "safety_guardrails",
+    "wandb"
+  ],
+  "Deployment": [
+    "deployment",
+    "mlops",
+    "fastapi",
+    "docker",
+    "kubernetes",
+    "github_actions"
+  ],
+  "Data/ML Foundations": [
+    "sql",
+    "statistics",
+    "machine_learning",
+    "deep_learning",
+    "pytorch",
+    "tensorflow"
+  ],
+  "Software Engineering": [
+    "python"
+  ]
+}
